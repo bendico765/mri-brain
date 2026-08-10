@@ -14,20 +14,25 @@ class WMH(torch.utils.data.Dataset):
 	"""
 
 	@staticmethod
-	def __get_scans_filepath(dir_path: str):
+	def get_scans_filepath(dir_path: str):
+		"""
+
+		:param dir_path: Path to the center and scanner folder data
+		:return:
+		"""
 		path = Path(dir_path)
 		t1_filepaths = []
 		flair_filepaths = []
 		segmentation_filepaths = []
 
 		for patient_dir in sorted(p for p in path.iterdir() if p.is_dir()):
-			t1_pre_nifti = patient_dir / "pre" / "T1.nii"
-			flair_pre_nifti = patient_dir / "pre" / "FLAIR.nii"
-			segmentation_nifti = patient_dir / "wmh.nii"
+			t1_pre_nifti_filepath = patient_dir / "pre" / "T1.nii"
+			flair_pre_nifti_filepath = patient_dir / "pre" / "FLAIR.nii"
+			segmentation_nifti_filepath = patient_dir / "wmh.nii"
 
-			t1_filepaths.append(t1_pre_nifti)
-			flair_filepaths.append(flair_pre_nifti)
-			segmentation_filepaths.append(segmentation_nifti)
+			t1_filepaths.append(str(t1_pre_nifti_filepath))
+			flair_filepaths.append(str(flair_pre_nifti_filepath))
+			segmentation_filepaths.append(str(segmentation_nifti_filepath))
 
 		return t1_filepaths, flair_filepaths, segmentation_filepaths
 
@@ -53,14 +58,14 @@ class WMH(torch.utils.data.Dataset):
 		if data_split is None or data_split == "training":
 			# load up Amsterdam data
 			if center is None or center == "Amsterdam":
-				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.__get_scans_filepath(f"{dataset_root_path}/wmh_data/training/Amsterdam/GE3T")
+				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.get_scans_filepath(f"{dataset_root_path}/wmh_data/training/Amsterdam/GE3T")
 				self.t1_filepaths.extend(t1_filepaths)
 				self.flair_filepaths.extend(flair_filepaths)
 				self.segmentation_filepaths.extend(segmentation_filepaths)
 
 			# load up Singapore data
 			if center is None or center == "Singapore":
-				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.__get_scans_filepath(
+				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.get_scans_filepath(
 					f"{dataset_root_path}/wmh_data/training/Singapore")
 				self.t1_filepaths.extend(t1_filepaths)
 				self.flair_filepaths.extend(flair_filepaths)
@@ -68,7 +73,7 @@ class WMH(torch.utils.data.Dataset):
 
 			# load up Utrecht data
 			if center is None or center == "Utrecht":
-				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.__get_scans_filepath(
+				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.get_scans_filepath(
 					f"{dataset_root_path}/wmh_data/training/Utrecht")
 				self.t1_filepaths.extend(t1_filepaths)
 				self.flair_filepaths.extend(flair_filepaths)
@@ -78,7 +83,7 @@ class WMH(torch.utils.data.Dataset):
 			# load up Amsterdam data
 			if center is None or center == "Amsterdam":
 				for scanner in ["GE3T", "GE1T5", "Philips_VU .PETMR_01."]:
-					t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.__get_scans_filepath(
+					t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.get_scans_filepath(
 						f"{dataset_root_path}/wmh_data/test/Amsterdam/{scanner}")
 					self.t1_filepaths.extend(t1_filepaths)
 					self.flair_filepaths.extend(flair_filepaths)
@@ -86,7 +91,7 @@ class WMH(torch.utils.data.Dataset):
 			
 			# load up Singapore data
 			if center is None or center == "Singapore":
-				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.__get_scans_filepath(
+				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.get_scans_filepath(
 					f"{dataset_root_path}/wmh_data/test/Singapore")
 				self.t1_filepaths.extend(t1_filepaths)
 				self.flair_filepaths.extend(flair_filepaths)
@@ -94,7 +99,7 @@ class WMH(torch.utils.data.Dataset):
 
 			# load up Utrecht data
 			if center is None or center == "Utrecht":
-				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.__get_scans_filepath(
+				t1_filepaths, flair_filepaths, segmentation_filepaths = WMH.get_scans_filepath(
 					f"{dataset_root_path}/wmh_data/test/Utrecht")
 				self.t1_filepaths.extend(t1_filepaths)
 				self.flair_filepaths.extend(flair_filepaths)
