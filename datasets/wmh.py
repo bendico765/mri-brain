@@ -3,6 +3,7 @@ from typing import Optional
 import torch
 import nibabel as nib
 from pathlib import Path
+import pandas as pd
 
 
 class WMH(torch.utils.data.Dataset):
@@ -12,6 +13,60 @@ class WMH(torch.utils.data.Dataset):
 	- Different resolutions for different images
 	- different number of slices within the same center (e.g. singapore training)
 	"""
+
+	@staticmethod
+	def get_metadata(dataset_root_path: str) -> pd.DataFrame:
+		entries = []
+
+		for set in ["training", "test"]:
+			for center in ["Amsterdam", "Singapore", "Utrecht"]:
+				path = Path(f"{dataset_root_path}/wmh_data/{set}/{center}")
+
+				if center == "Amsterdam":
+					for scanner_dir in path.iterdir():
+						scanner = scanner_dir.name
+						for patient_dir in sorted(p for p in scanner_dir.iterdir() if p.is_dir()):
+							patient_name = patient_dir.name
+
+							t1_pre_nifti_filepath = str(patient_dir / "pre" / "T1.nii")
+							flair_pre_nifti_filepath = str(patient_dir / "pre" / "FLAIR.nii")
+							segmentation_nifti_filepath = str(patient_dir / "wmh.nii")
+
+							t1_pre_nifti_filepath = t1_pre_nifti_filepath.replace(f"{dataset_root_path}/", "")
+							flair_pre_nifti_filepath = flair_pre_nifti_filepath.replace(f"{dataset_root_path}/", "")
+							segmentation_nifti_filepath = segmentation_nifti_filepath.replace(f"{dataset_root_path}/", "")
+
+							entries.append(
+								(set, center, scanner, patient_name, t1_pre_nifti_filepath, flair_pre_nifti_filepath, segmentation_nifti_filepath)
+							)
+				else:
+					scanner = "GE3T"
+					for patient_dir in sorted(p for p in path.iterdir() if p.is_dir()):
+						patient_name = patient_dir.name
+
+						t1_pre_nifti_filepath = str(patient_dir / "pre" / "T1.nii")
+						flair_pre_nifti_filepath = str(patient_dir / "pre" / "FLAIR.nii")
+						segmentation_nifti_filepath = str(patient_dir / "wmh.nii")
+
+						t1_pre_nifti_filepath = t1_pre_nifti_filepath.replace(f"{dataset_root_path}/", "")
+						flair_pre_nifti_filepath = flair_pre_nifti_filepath.replace(f"{dataset_root_path}/", "")
+						segmentation_nifti_filepath = segmentation_nifti_filepath.replace(f"{dataset_root_path}/", "")
+
+						entries.append(
+							(set, center, scanner, patient_name, t1_pre_nifti_filepath, flair_pre_nifti_filepath,
+							 segmentation_nifti_filepath)
+						)
+
+		return pd.DataFrame(entries, columns=[
+			"SET",
+			"CENTER",
+			"SCANNER",
+			"PATIENT",
+			"T1W FILEPATH",
+			"FLAIR FILEPATH",
+	        "SEGMENTATION FILEPATH"
+		])
+
 
 	@staticmethod
 	def get_scans_filepath(dir_path: str):
