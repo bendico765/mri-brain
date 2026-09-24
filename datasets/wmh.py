@@ -86,7 +86,7 @@ class WMH(torch.utils.data.Dataset):
 		:param device: Device to be used from skull stripping, can be "cpu" or "gpu"
 		"""
 		Path(output_dir_filepath).mkdir(parents=True, exist_ok=True)
-		Path(f"{output_dir_filepath}/addtional_files").mkdir(parents=True, exist_ok=True)
+		Path(f"{output_dir_filepath}/additional_files").mkdir(parents=True, exist_ok=True)
 
 		# skull stripping on t1w
 		with tempfile.NamedTemporaryFile(suffix=".nii.gz") as tmp:
@@ -101,6 +101,8 @@ class WMH(torch.utils.data.Dataset):
 			path = tmp.name.split(".")[0]  # removing extension
 			brain_mask_nib = nib.load(f"{path}_bet.nii.gz")
 			brain_mask_array = brain_mask_nib.get_fdata()
+
+			nib.save(brain_mask_nib, f"{output_dir_filepath}/additional_files/t1w_brain_mask.nii.gz")
 
 		# apply brain mask on flair and segmentation masks
 		flair_nib = nib.load(input_flair_filepath)
@@ -123,7 +125,7 @@ class WMH(torch.utils.data.Dataset):
 	        antsRegistration \
 	        --dimensionality 3 \
 	        --float 0 \
-	        --output ["{output_dir_filepath}/addtional_files/T1_to_MNI_","{tmpdir}/T1_MNI.nii.gz","{output_dir_filepath}/addtional_files/T1_from_MNI.nii.gz"] \
+	        --output ["{output_dir_filepath}/additional_files/T1_to_MNI_","{tmpdir}/T1_MNI.nii.gz","{output_dir_filepath}/additional_files/T1_from_MNI.nii.gz"] \
 	        --interpolation Linear \
 	        --winsorize-image-intensities [0.005,0.995] \
 	        --use-histogram-matching 0 \
@@ -159,8 +161,8 @@ class WMH(torch.utils.data.Dataset):
 	        --reference-image "{template_t1w_filepath}" \
 	        --output "{tmpdir}/FLAIR_MNI.nii.gz" \
 	        --interpolation Linear \
-	        --transform "{output_dir_filepath}/addtional_files/T1_to_MNI_1Warp.nii.gz" \
-	        --transform "{output_dir_filepath}/addtional_files/T1_to_MNI_0GenericAffine.mat"
+	        --transform "{output_dir_filepath}/additional_files/T1_to_MNI_1Warp.nii.gz" \
+	        --transform "{output_dir_filepath}/additional_files/T1_to_MNI_0GenericAffine.mat"
 	        """)
 
 			output_flair_nib = nib.load(f"{tmpdir}/FLAIR_MNI.nii.gz")
@@ -176,8 +178,8 @@ class WMH(torch.utils.data.Dataset):
 	        --reference-image "{template_t1w_filepath}" \
 	        --output "{tmpdir}/ROI_MNI.nii.gz" \
 	        --interpolation NearestNeighbor \
-	        --transform "{output_dir_filepath}/addtional_files/T1_to_MNI_1Warp.nii.gz" \
-	        --transform "{output_dir_filepath}/addtional_files/T1_to_MNI_0GenericAffine.mat"
+	        --transform "{output_dir_filepath}/additional_files/T1_to_MNI_1Warp.nii.gz" \
+	        --transform "{output_dir_filepath}/additional_files/T1_to_MNI_0GenericAffine.mat"
 	        """)
 
 			output_roi_nib = nib.load(f"{tmpdir}/ROI_MNI.nii.gz")
