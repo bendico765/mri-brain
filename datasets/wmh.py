@@ -191,7 +191,8 @@ class WMH(torch.utils.data.Dataset):
 	def preprocess_dataset(
 			output_dir_filepath: str,
 			dataset_root_path: str,
-			template_t1w_filepath: str
+			template_t1w_filepath: str,
+			device: str = "cpu"
 	):
 		df = WMH.get_metadata(dataset_root_path)
 
@@ -209,12 +210,13 @@ class WMH(torch.utils.data.Dataset):
 			# create folder for patient data
 			Path(f'{output_dir_filepath}/wmh_data/{patient_id}').mkdir(parents=True, exist_ok=True)
 
-			WMH.preprocess(
+			WMH.preprocess_patient(
 				t1w_filepath,
 				flair_filepath,
 				segmentation_filepath,
 				template_t1w_filepath,
-				f'{output_dir_filepath}/{patient_id}'
+				f'{output_dir_filepath}/{patient_id}',
+				device
 			)
 
 	@staticmethod
