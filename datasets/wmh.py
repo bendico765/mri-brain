@@ -120,13 +120,12 @@ class WMH(torch.utils.data.Dataset):
 		with tempfile.TemporaryDirectory() as tmpdir:
 			# saving the T1w skull stripped
 			nib.save(nib.Nifti1Image(t1w_brain_array, t1w_brain_affine), f"{tmpdir}/t1w_brain.nii.gz")
-
-			print("Perform registration")
+			
 			os.system(f"""
 	        antsRegistration \
 	        --dimensionality 3 \
 	        --float 0 \
-	        --output ["{output_dir_filepath}/additional_files/T1_to_MNI_","{tmpdir}/T1_MNI.nii.gz","{output_dir_filepath}/additional_files/T1_from_MNI.nii.gz"] \
+	        --output ["{output_dir_filepath}/additional_files/T1_to_MNI_","{output_dir_filepath}/T1w.nii.gz","{output_dir_filepath}/additional_files/T1_from_MNI.nii.gz"] \
 	        --interpolation Linear \
 	        --winsorize-image-intensities [0.005,0.995] \
 	        --use-histogram-matching 0 \
@@ -149,7 +148,7 @@ class WMH(torch.utils.data.Dataset):
 	        """)
 
 			# reorient to ras
-			output_t1w_nib = nib.load(f"{tmpdir}/T1_MNI.nii.gz")
+			output_t1w_nib = nib.load(f"{output_dir_filepath}/T1w.nii.gz")
 			output_t1w_nib = nib.as_closest_canonical(output_t1w_nib)
 			nib.save(output_t1w_nib, f"{output_dir_filepath}/T1w.nii.gz")
 
