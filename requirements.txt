@@ -308,7 +308,6 @@ pydantic_core==2.46.4
 Pygments==2.20.0
 pykwalify==1.8.0
 pyparsing==3.3.2
-pyradiomics @ file:///home/gianluca/Downloads/pyradiomics-master
 python-dateutil==2.9.0.post0
 python-json-logger==4.0.0
 pytz==2026.3.post1
