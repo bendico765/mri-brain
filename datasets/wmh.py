@@ -1,6 +1,7 @@
 from typing import Optional
 
 import torch
+from tqdm import tqdm
 import nibabel as nib
 from pathlib import Path
 import pandas as pd
@@ -65,7 +66,7 @@ class WMH(torch.utils.data.Dataset):
 		])
 
 	@staticmethod
-	def preprocess(
+	def preprocess_patient(
 			input_t1w_filepath: str,
 			input_flair_filepath: str,
 			input_segmentation_filepath: str,
@@ -185,6 +186,36 @@ class WMH(torch.utils.data.Dataset):
 			output_roi_nib = nib.load(f"{tmpdir}/ROI_MNI.nii.gz")
 			output_roi_nib = nib.as_closest_canonical(output_roi_nib)
 			nib.save(output_roi_nib, f"{output_dir_filepath}/ROI.nii.gz")
+
+	@staticmethod
+	def preprocess_dataset(
+			output_dir_filepath: str,
+			dataset_root_path: str,
+			template_t1w_filepath: str
+	):
+		df = WMH.get_metadata(dataset_root_path)
+
+		for _, row in tqdm(df.iterrows(), total=len(df)):
+			patient_id = row["PATIENT"]
+
+			t1w_filepath = row["T1W FILEPATH"]
+			flair_filepath = row["FLAIR FILEPATH"]
+			segmentation_filepath = row["SEGMENTATION FILEPATH"]
+
+			t1w_filepath = f"{dataset_root_path}/{t1w_filepath}"
+			flair_filepath = f"{dataset_root_path}/{flair_filepath}"
+			segmentation_filepath = f"{dataset_root_path}/{segmentation_filepath}"
+
+			# create folder for patient data
+			Path(f'{output_dir_filepath}/wmh_data/{patient_id}').mkdir(parents=True, exist_ok=True)
+
+			WMH.preprocess(
+				t1w_filepath,
+				flair_filepath,
+				segmentation_filepath,
+				template_t1w_filepath,
+				f'{output_dir_filepath}/{patient_id}'
+			)
 
 	@staticmethod
 	def get_scans_filepath(dir_path: str):
