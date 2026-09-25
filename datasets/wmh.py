@@ -120,7 +120,7 @@ class WMH(torch.utils.data.Dataset):
 		with tempfile.TemporaryDirectory() as tmpdir:
 			# saving the T1w skull stripped
 			nib.save(nib.Nifti1Image(t1w_brain_array, t1w_brain_affine), f"{tmpdir}/t1w_brain.nii.gz")
-			
+
 			os.system(f"""
 	        antsRegistration \
 	        --dimensionality 3 \
@@ -207,7 +207,7 @@ class WMH(torch.utils.data.Dataset):
 			segmentation_filepath = f"{dataset_root_path}/{segmentation_filepath}"
 
 			# create folder for patient data
-			Path(f'{output_dir_filepath}/wmh_data/{patient_id}').mkdir(parents=True, exist_ok=True)
+			Path(f'{output_dir_filepath}/{patient_id}').mkdir(parents=True, exist_ok=True)
 
 			WMH.preprocess_patient(
 				t1w_filepath,
